@@ -1,4 +1,4 @@
-package com.hk.sf001.stack;
+package com.hk.s.stack;
 
 /**
  * @author k

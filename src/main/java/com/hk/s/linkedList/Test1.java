@@ -1,4 +1,4 @@
-package com.hk.sf001.linkedList;
+package com.hk.s.linkedList;
 
 /**  双向链表
  * @author k

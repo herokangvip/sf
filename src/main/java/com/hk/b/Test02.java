@@ -1,6 +1,4 @@
-package com.hk.bytedance;
-
-import java.util.Stack;
+package com.hk.b;
 
 /**
  * 反转单向链表

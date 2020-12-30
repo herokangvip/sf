@@ -1,4 +1,4 @@
-package com.hk.sf001.yuesefu;
+package com.hk.s.yuesefu;
 
 /**
  * 约瑟夫问题：环形单向链表

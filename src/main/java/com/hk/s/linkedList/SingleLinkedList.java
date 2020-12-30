@@ -1,4 +1,4 @@
-package com.hk.sf001.linkedList;
+package com.hk.s.linkedList;
 
 /**
  * 带头节点的单向链表

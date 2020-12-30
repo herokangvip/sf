@@ -1,8 +1,4 @@
-package com.hk.bytedance;
-
-import sun.font.FontRunIterator;
-
-import java.util.HashMap;
+package com.hk.b;
 
 /**
  * m行n列网格，从左上角走到右下角共几种走法，每次只能向下或向右

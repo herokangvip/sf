@@ -1,4 +1,4 @@
-package com.hk.sf001.linkedList;
+package com.hk.s.linkedList;
 
 import java.io.Serializable;
 import java.util.NoSuchElementException;
