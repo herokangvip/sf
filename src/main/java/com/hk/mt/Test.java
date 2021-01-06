@@ -246,35 +246,100 @@ public class Test {
         HashSet<Integer> set = new HashSet<>();
         //转为两数之和
         for (int i = 0; i < nums.length; i++) {
-            int target = 0 - nums[i];
-            if (set.contains(nums[i])) {
+            int sum = -nums[i];
+            if (i > 0 && nums[i] == nums[i - 1]) {
                 continue;
             }
-            if (i == nums.length - 2) {
-                break;
+            if (nums[i] > 0) {
+                continue;
             }
             int left = i + 1;
             int right = nums.length - 1;
-            if (nums[right] < target) {
-                continue;
-            }
-            boolean flag = true;
-            while (flag && left < right) {
-                if (nums[left] + nums[right] < target) {
+            while (left < right) {
+                int total = nums[left] + nums[right];
+                if (left > i + 1 && nums[left] == nums[left - 1]) {
                     left++;
-                } else if (nums[left] + nums[right] > target) {
-                    right--;
-                } else {
-                    //找到目标
-                    set.add(nums[i]);
-                    set.add(nums[left]);
-                    set.add(nums[right]);
+                    continue;
+                }
+                if (total == sum) {
                     ArrayList<Integer> list = new ArrayList<>();
                     list.add(nums[i]);
                     list.add(nums[left]);
                     list.add(nums[right]);
                     res.add(list);
-                    flag = false;
+                    left++;
+                    right--;
+                } else if (total < sum) {
+                    left++;
+                } else {
+                    right--;
+                }
+            }
+
+        }
+        return res;
+    }
+
+    /**
+     * 给定一个 没有重复 数字的序列，返回其所有可能的全排列。
+     */
+    public static List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        //决策树
+        LinkedList<Integer> track = new LinkedList<>();
+        //可用元素集合
+        boolean[] used = new boolean[nums.length];
+        backtrack(nums, used, track, res);
+        return res;
+    }
+
+    private static void backtrack(int[] nums, boolean[] used, LinkedList<Integer> track, List<List<Integer>> res) {
+        if (track.size() == nums.length) {
+            res.addAll(Collections.singleton(new ArrayList<>(track)));
+            return;
+        }
+
+        for (int i = 0; i < nums.length; i++) {
+            // 排除不合法的选择
+            if (used[i]) {
+                continue;
+            }
+            // 做选择
+            track.addLast(nums[i]);
+            used[i] = true;
+            // 进入下一层决策树
+            backtrack(nums, used, track, res);
+            // 取消选择
+            track.removeLast();
+            used[i] = false;
+        }
+    }
+
+    /**
+     * 给定一个字符串 s，找到 s 中最长的回文子串。你可以假设 s 的最大长度为 1000。
+     */
+    public String longestPalindrome(String s) {
+        if (s == null || s.length() <= 1) return s;
+        int length = s.length();
+        boolean[][] arr = new boolean[length][length];
+        String res = "";
+        //边界单个字母或两个字母相同
+        for (int i = 0; i < length; i++) {
+            for (int j = 0; j < length; j++) {
+                int start = j;
+                int end = j + i;
+                if (start > end || end > length - 1) {
+                    continue;
+                }
+                if (end - start == 1) {
+                    arr[start][end] = s.charAt(start) == s.charAt(end);
+                } else if (end - start == 0) {
+                    arr[start][end] = true;
+                } else {
+                    arr[start][end] = arr[start + 1][end - 1] && s.charAt(start) == s.charAt(end);
+                }
+                if (arr[start][end] && (end - start + 1) > res.length()) {
+                    res = s.substring(start, end + 1);
                 }
             }
         }
@@ -282,9 +347,112 @@ public class Test {
     }
 
 
+    /**
+     * 给定一个包含 m x n 个元素的矩阵（m 行, n 列），请按照顺时针螺旋顺序，返回矩阵中的所有元素。
+     */
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> res = new ArrayList<>();
+
+        return res;
+    }
+
+    /**
+     * 一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为“Start” ）。
+     * <p>
+     * 机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为“Finish”）。
+     * <p>
+     * 现在考虑网格中有障碍物。那么从左上角到右下角将会有多少条不同的路径？
+     * <p>
+     * 来源：力扣（LeetCode）
+     * 链接：https://leetcode-cn.com/problems/unique-paths-ii
+     * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+     */
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m = obstacleGrid.length;
+        int n = obstacleGrid[0].length;
+        int[][] arr = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            if (obstacleGrid[i][0] == 1) {
+                break;
+            }
+            arr[i][0] = 1;
+        }
+        for (int i = 0; i < n; i++) {
+            if (obstacleGrid[0][i] == 1) {
+                break;
+            }
+            arr[0][i] = 1;
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (obstacleGrid[i][j] == 1) {
+                    arr[i][j] = 0;
+                } else {
+                    arr[i][j] = arr[i - 1][j] + arr[i][j - 1];
+                }
+            }
+        }
+        return arr[m - 1][n - 1];
+    }
+
+    /**
+     * 给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
+     * 子序列是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。例如，[3,6,2,7] 是数组 [0,3,1,6,2,2,7] 的子序列。
+     * 来源：力扣（LeetCode）
+     * 链接：https://leetcode-cn.com/problems/longest-increasing-subsequence
+     * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+     */
+    public int lengthOfLIS(int[] nums) {
+        int length = nums.length;
+        if (length <= 1) return length;
+
+        int[] arr = new int[length];
+        arr[0] = 1;
+        int max = 1;
+        for (int i = 1; i < length; i++) {
+            arr[i] = 1;
+            for (int j = 0; j < i; j++) {
+                if (nums[j] < nums[i]) {
+                    arr[i] = Math.max(arr[i], arr[j] + 1);
+                }
+            }
+            max = Math.max(max, arr[i]);
+        }
+        return max;
+    }
+
+    /**
+     * 给你一个整数数组 nums ，返回该数组所有可能的子集（幂集）。解集不能包含重复的子集。
+     */
+    public static List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (nums == null || nums.length == 0) return res;
+        //决策树
+        LinkedList<Integer> track = new LinkedList<>();
+        backtrack2(0,nums, track, res);
+        return res;
+    }
+
+    private static void backtrack2(int start, int[] nums, LinkedList<Integer> track, List<List<Integer>> res) {
+        if (start == nums.length-1) {
+            res.addAll(Collections.singleton(new ArrayList<>(track)));
+            return;
+        }
+
+        for (int i = start; i < nums.length; i++) {
+            // 做选择
+            track.addLast(nums[i]);
+            // 进入下一层决策树
+            backtrack2(i+1, nums, track, res);
+            // 取消选择
+            track.removeLast();
+        }
+    }
+
+
     public static void main(String[] args) {
-        int[] arr = new int[]{-1, 0, 1, 2, -1, -4};
-        threeSum(arr);
+        int[] arr = new int[]{1, 2, 3};
+        List<List<Integer>> subsets = subsets(arr);
         System.out.println("-");
 
     }
