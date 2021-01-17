@@ -424,35 +424,326 @@ public class Test {
     /**
      * 给你一个整数数组 nums ，返回该数组所有可能的子集（幂集）。解集不能包含重复的子集。
      */
-    public static List<List<Integer>> subsets(int[] nums) {
+    public static List<List<Integer>> permuteUnique(int[] nums) {
         List<List<Integer>> res = new ArrayList<>();
         if (nums == null || nums.length == 0) return res;
         //决策树
         LinkedList<Integer> track = new LinkedList<>();
-        backtrack2(0,nums, track, res);
+        boolean[] select = new boolean[nums.length];
+        backtrack2(select, nums, track, res);
         return res;
     }
 
-    private static void backtrack2(int start, int[] nums, LinkedList<Integer> track, List<List<Integer>> res) {
-        if (start == nums.length-1) {
+    private static void backtrack2(boolean[] select, int[] nums, LinkedList<Integer> track, List<List<Integer>> res) {
+        if (track.size() == nums.length) {
             res.addAll(Collections.singleton(new ArrayList<>(track)));
             return;
         }
 
-        for (int i = start; i < nums.length; i++) {
+        for (int i = 0; i < nums.length; i++) {
+            if (select[i] || i > 0 && nums[i] == nums[i - 1] && !select[i - 1]) {
+                continue;
+            }
             // 做选择
             track.addLast(nums[i]);
+            select[i] = true;
             // 进入下一层决策树
-            backtrack2(i+1, nums, track, res);
+            backtrack2(select, nums, track, res);
             // 取消选择
             track.removeLast();
+            select[i] = false;
+
         }
+    }
+
+
+    /**
+     * 给定一个链表，判断链表中是否有环。floyd floyd判圈算法（龟兔算法）
+     */
+    public boolean hasCycle(ListNode head) {
+        if (head == null || head.next == null) {
+            return false;
+        }
+        ListNode slow = head;
+        ListNode fast = head.next;
+        while (true) {
+            if (slow == fast) {
+                return true;
+            }
+            if (fast.next == null || fast.next.next == null) {
+                return false;
+            }
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+    }
+
+
+    /**
+     * 输入一个字符串，打印出该字符串中字符的所有排列。
+     * 你可以以任意顺序返回这个字符串数组，但里面不能有重复元素。
+     * 示例:
+     * 输入：s = "abc"
+     * 输出：["abc","acb","bac","bca","cab","cba"]
+     * 链接：https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof
+     */
+    public String[] permutation(String s) {
+        int length = s.length();
+        char[] array = s.toCharArray();
+        Arrays.sort(array);
+        //结果集
+        List<String> res = new ArrayList<>();
+        //决策树
+        StringBuilder sb = new StringBuilder();
+        //选择记录
+        boolean[] used = new boolean[length];
+        select(sb, used, res, array);
+        return res.toArray(new String[res.size()]);
+    }
+
+    private void select(StringBuilder sb, boolean[] used, List<String> res, char[] array) {
+        if (sb.length() == array.length) {
+            res.add(sb.toString());
+            return;
+        }
+        for (int i = 0; i < array.length; i++) {
+            if (used[i] || (i > 0 && array[i] == array[i - 1] && !used[i - 1])) {
+                continue;
+            }
+            //做选择
+            sb.append(array[i]);
+            used[i] = true;
+            select(sb, used, res, array);
+            //取消选择
+            sb.deleteCharAt(sb.length() - 1);
+            used[i] = false;
+        }
+    }
+
+
+    /**
+     * 给你一个整数数组 nums ，返回该数组所有可能的子集（幂集）。解集不能包含重复的子集。
+     * <p>
+     * 示例 1：
+     * <p>
+     * 输入：nums = [1,2,3]
+     * 输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+     */
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        List<Integer> select = new ArrayList<Integer>();
+        dfs(0, select, nums, res);
+        return res;
+    }
+
+    private void dfs(int index, List<Integer> select, int[] nums, List<List<Integer>> res) {
+        res.add(new ArrayList<Integer>(select));
+        for (int i = index; i < nums.length; i++) {
+            select.add(nums[i]);
+            dfs(i + 1, select, nums, res);
+            select.remove(select.size() - 1);
+        }
+    }
+
+
+    public static List<List<Integer>> subsetsWithDup(int[] nums) {
+        List<Integer> select = new ArrayList<Integer>();
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        Arrays.sort(nums);
+        dfs2(0, select, nums, res);
+        return res;
+    }
+
+    private static void dfs2(int index, List<Integer> select, int[] nums, List<List<Integer>> res) {
+        res.add(new ArrayList<>(select));
+        for (int i = index; i < nums.length; i++) {
+            //和上个数字相等就跳过
+            if (i > index && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            select.add(nums[i]);
+            dfs2(i + 1, select, nums, res);
+            select.remove(select.size() - 1);
+        }
+    }
+
+
+    /**
+     * 给定两个整数 n 和 k，返回 1 ... n 中所有可能的 k 个数的组合。
+     * <p>
+     * 示例:
+     * <p>
+     * 输入: n = 4, k = 2
+     * 输出:
+     * [
+     * [2,4],
+     * [3,4],
+     * [2,3],
+     * [1,2],
+     * [1,3],
+     * [1,4],
+     * ]
+     * <p>
+     * 来源：力扣（LeetCode）
+     * 链接：https://leetcode-cn.com/problems/combinations
+     */
+    public List<List<Integer>> combine(int n, int k) {
+        int[] nums = new int[n];
+        for (int i = 1; i <= n; i++) {
+            nums[i - 1] = i;
+        }
+        List<List<Integer>> res = new ArrayList<>();
+        List<Integer> select = new ArrayList<>();
+        combineDfs(0, k, nums, select, res);
+        return res;
+    }
+
+    private void combineDfs(int index, int k, int[] nums, List<Integer> select, List<List<Integer>> res) {
+        if (select.size() == k) {
+            res.add(new ArrayList<>(select));
+            return;
+        }
+        for (int i = index; i < nums.length; i++) {
+            select.add(nums[i]);
+            combineDfs(i + 1, k, nums, select, res);
+            select.remove(select.size() - 1);
+        }
+    }
+
+    /**
+     * 给定一个无重复元素的数组 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。
+     * <p>
+     * candidates 中的数字可以无限制重复被选取。
+     * <p>
+     * 说明：
+     * <p>
+     * 所有数字（包括 target）都是正整数。
+     * 解集不能包含重复的组合。 
+     * 示例 1：
+     * <p>
+     * 输入：candidates = [2,3,6,7], target = 7,
+     * 所求解集为：
+     * [
+     * [7],
+     * [2,2,3]
+     * ]
+     * 示例 2：
+     * <p>
+     * 来源：力扣（LeetCode）
+     * 链接：https://leetcode-cn.com/problems/combination-sum
+     */
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> res = new ArrayList<>();
+        List<Integer> select = new ArrayList<>();
+        Arrays.sort(candidates);
+        Integer sum = 0;
+        combinationSumDfs(0, sum, candidates, target, select, res);
+        return res;
+    }
+
+    private void combinationSumDfs(int index, int sum, int[] candidates, int target, List<Integer> select, List<List<Integer>> res) {
+        if (sum == target) {
+            res.add(new ArrayList<>(select));
+            return;
+        } else if (sum > target) {
+            return;
+        }
+        for (int i = index; i < candidates.length; i++) {
+            select.add(candidates[i]);
+            sum = sum + candidates[i];
+            combinationSumDfs(i, sum, candidates, target, select, res);
+            Integer remove = select.remove(select.size() - 1);
+            sum = sum - remove;
+        }
+    }
+
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        List<List<Integer>> res = new ArrayList<>();
+        List<Integer> select = new ArrayList<>();
+        Arrays.sort(candidates);
+        Integer sum = 0;
+        combinationSumDfs2(0, sum, candidates, target, select, res);
+        return res;
+    }
+
+    private void combinationSumDfs2(int index, int sum, int[] candidates, int target, List<Integer> select, List<List<Integer>> res) {
+        if (sum == target) {
+            res.add(new ArrayList<>(select));
+            return;
+        } else if (sum > target) {
+            return;
+        }
+        for (int i = index; i < candidates.length; i++) {
+            if (i > 0 && candidates[i] == candidates[i - 1]) {
+                continue;
+            }
+            select.add(candidates[i]);
+            sum = sum + candidates[i];
+            combinationSumDfs(i + 1, sum, candidates, target, select, res);
+            Integer remove = select.remove(select.size() - 1);
+            sum = sum - remove;
+        }
+    }
+
+
+    /**
+     * n皇后问题
+     */
+    public List<List<String>> solveNQueens(int n) {
+        List<List<String>> solutions = new ArrayList<List<String>>();
+        int[] queens = new int[n];
+        Arrays.fill(queens, -1);
+        Set<Integer> columns = new HashSet<Integer>();
+        Set<Integer> diagonals1 = new HashSet<Integer>();
+        Set<Integer> diagonals2 = new HashSet<Integer>();
+        backtrack(solutions, queens, n, 0, columns, diagonals1, diagonals2);
+        return solutions;
+    }
+
+    public void backtrack(List<List<String>> solutions, int[] queens, int n, int row, Set<Integer> columns, Set<Integer> diagonals1, Set<Integer> diagonals2) {
+        if (row == n) {
+            List<String> board = generateBoard(queens, n);
+            solutions.add(board);
+        }
+        for (int i = 0; i < n; i++) {
+            if (columns.contains(i)) {
+                continue;
+            }
+            int diagonal1 = row - i;
+            if (diagonals1.contains(diagonal1)) {
+                continue;
+            }
+            int diagonal2 = row + i;
+            if (diagonals2.contains(diagonal2)) {
+                continue;
+            }
+            queens[row] = i;
+            columns.add(i);
+            diagonals1.add(diagonal1);
+            diagonals2.add(diagonal2);
+            backtrack(solutions, queens, n, row + 1, columns, diagonals1, diagonals2);
+            queens[row] = -1;
+            columns.remove(i);
+            diagonals1.remove(diagonal1);
+            diagonals2.remove(diagonal2);
+        }
+    }
+
+    public List<String> generateBoard(int[] queens, int n) {
+        List<String> board = new ArrayList<String>();
+        for (int i = 0; i < n; i++) {
+            char[] row = new char[n];
+            Arrays.fill(row, '.');
+            row[queens[i]] = 'Q';
+            board.add(new String(row));
+        }
+        return board;
     }
 
 
     public static void main(String[] args) {
         int[] arr = new int[]{1, 2, 3};
-        List<List<Integer>> subsets = subsets(arr);
+        List<List<Integer>> subsets = subsetsWithDup(arr);
         System.out.println("-");
 
     }
