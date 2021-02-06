@@ -361,12 +361,13 @@ public class Test2 {
 
     private static void quickSort(int[] arr, int start, int end) {
         if (start < end) {
+            //不用包含index，因为他前面都比他小后面都比他大
             int index = partition(arr, start, end);
             quickSort(arr, start, index - 1);
             quickSort(arr, index + 1, end);
         }
     }
-
+    //取第一个数，然后比他小的放到左边，打的放到右边并返回交换后的索引
     private static int partition(int[] arr, int start, int end) {
         int res = start;
         int temp = start + 1;
